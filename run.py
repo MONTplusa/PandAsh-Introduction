@@ -2,7 +2,7 @@ from app.app import app
 from waitress import serve
 
 
-@app.route("/", methods=["GET"])
+@app.route("/home", methods=["GET"])
 def home():
     return "ホームページ（仮）"
 
