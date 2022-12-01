@@ -8,6 +8,24 @@ def home():
     return "ホームページ（仮）"
 
 
+@app.route("/test/is_even/<num>", methods=["GET"])
+def is_even(num):
+
+    if int(num) % 2 == 0:
+        return "even"
+    return "odd"
+
+
+@app.route("/test/is_even_2", methods=["GET"])
+def is_even_2():
+    num = flask.request.args.get("num")
+    if num == None:
+        return "error"
+    if int(num) % 2 == 0:
+        return "even"
+    return "odd"
+
+
 @app.route("/", methods=["GET"])
 def root():
     # return flask.redirect("http://localhost:5000/home")でもOK
