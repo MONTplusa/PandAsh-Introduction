@@ -32,6 +32,20 @@ def root():
     return flask.redirect(flask.url_for("home"))  # この"home"は関数名
 
 
+@app.before_request
+def before_request():
+    if flask.request.endpoint == "is_even":
+        flask.abort(403)
+    if flask.request.endpoint == "is_even_2":
+        flask.abort(403)
+
+
+@app.errorhandler(403)
+def forbidden(error):
+    message = "アクセスが拒否されました。"
+    return message, 403
+
+
 @app.errorhandler(404)
 def page_not_found(error):
     message = "お探しのページは見つかりませんでした。"
