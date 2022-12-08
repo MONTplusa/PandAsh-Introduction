@@ -35,7 +35,9 @@ def register():
             .all()
         )
         if len(student_data) > 0:
-            return "そのstudent_idは既に存在します"
+            old_name = student_data[0].fullname
+            db_ses.bulk_update_mappings(student.Student, new_data)
+            return f"名前を更新しました。{old_name}->{item['fullname']}"
         db_ses.execute(student.Student.__table__.insert(), new_data)
         # 追加データが少数の場合は以下のほうが自然かも
         # new_item = student.Student()
