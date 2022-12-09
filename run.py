@@ -1,7 +1,9 @@
 from app.models import student
+from app.api import *
 from app.app import app
 from waitress import serve
 import flask
+import requests
 import contextlib
 import time
 from math import floor
@@ -12,6 +14,27 @@ from app.settings import session
 @app.route("/home", methods=["GET"])
 def home():
     return "ホームページ（仮）"
+
+
+@app.route("/update", methods=["GET"])
+def update():
+    ses = requests.Session()
+    user = get_user_json(ses)
+    item = get_user_info_from_api(user)
+    new_data = [item]
+    with open_db_ses() as db_ses:
+        # 既に同じidのものがないか確認し、あれば中止、なければ追加
+        student_data = (
+            db_ses.query(student.Student)
+            .filter(student.Student.student_id == item["student_id"])
+            .all()
+        )
+        if len(student_data) > 0:
+            old_name = student_data[0].fullname
+            db_ses.bulk_update_mappings(student.Student, new_data)
+            return f"名前を更新しました。{old_name}->{item['fullname']}"
+        db_ses.execute(student.Student.__table__.insert(), new_data)
+    return f"登録しました。ID:{item['student_id']}, 名前:{item['fullname']}"
 
 
 @app.route("/register", methods=["GET"])
