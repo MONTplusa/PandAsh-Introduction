@@ -9,4 +9,7 @@ session = orm.scoped_session(
     orm.sessionmaker(bind=engine, autoflush=True, autocommit=False)
 )
 
+USERNAME = ""  # PandAにログインするときのid
+PASSWORD = ""  # PandAにログインするときのパスワード
+
 Base = declarative_base()

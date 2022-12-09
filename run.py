@@ -8,7 +8,8 @@ import contextlib
 import time
 from math import floor
 import sqlalchemy.exc
-from app.settings import session
+from app.settings import session, USERNAME, PASSWORD
+from bs4 import BeautifulSoup
 
 
 @app.route("/home", methods=["GET"])
@@ -18,7 +19,26 @@ def home():
 
 @app.route("/update", methods=["GET"])
 def update():
+    # PandAのログインページ
+    login_url = "https://panda.ecs.kyoto-u.ac.jp/cas/login"
     ses = requests.Session()
+    time.sleep(1)
+    html = ses.get(login_url)
+    soup = BeautifulSoup(html.text, "html.parser")
+    # inputを全て取得
+    inputs = soup.find_all("input")
+    data = {}
+    for tag in inputs:
+        data[tag["name"]] = tag["value"]
+
+    data["username"] = USERNAME
+    data["password"] = PASSWORD
+    # 一応いらなさそうなものは消去
+    del data["warn"]
+    del data["reset"]
+    ses.post(login_url, data=data)
+    _ = ses.get("https://panda.ecs.kyoto-u.ac.jp/portal/login")
+
     user = get_user_json(ses)
     item = get_user_info_from_api(user)
     new_data = [item]
